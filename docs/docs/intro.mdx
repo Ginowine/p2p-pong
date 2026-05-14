@@ -1,0 +1,113 @@
+---
+sidebar_position: 1
+---
+
+# Introduction
+
+Welcome to the **P2P Pong** documentation! This is a simple, peer-to-peer multiplayer Pong game built with Pears P2P technology. The game connects two players directly without any central servers or middlemen!
+
+## App Overview
+
+This is a classic Pong game with the following features:
+- 1 vs 1 multiplayer gameplay (host vs guest)
+- Direct peer-to-peer connections using Hyperswarm
+- Persistent leaderboard stored locally using Hypercore
+- No servers, no databases — everything runs directly between players!
+
+## Architecture Overview
+
+The app has three main parts:
+1. **Frontend** (`ui/` folder): HTML, CSS, and JavaScript for the game UI and logic
+2. **Backend** (`index.js`): Bare/Node.js script that handles P2P connections using Hyperswarm
+3. **Communication**: pear-pipe connects the frontend and backend processes
+
+### P2P vs Centralized Approach
+- **Centralized**: All game data goes through a server, which acts as a middleman. If the server goes down, the game stops working.
+- **Peer-to-peer**: Players connect directly to each other. No single point of failure!
+
+## Setup Instructions
+
+### Prerequisites
+- Pear runtime installed on your desktop or laptop
+
+### Build from Scratch
+Follow our detailed "Getting Started" guide in the sidebar to build the entire app file by file!
+
+### Run If You Have the Code
+If you already have the project files:
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Run the app:
+   ```bash
+   pear run -d .
+   ```
+
+## Implementation Walkthrough
+
+### 1. Creating a Room (Host)
+When you click "Create room":
+1. The app generates a random 32-byte topic (room code)
+2. Starts a Hyperswarm instance
+3. Joins the DHT as a server, announcing itself under this topic
+4. Displays the room code for the guest to use
+
+### 2. Joining a Room (Guest)
+When you enter a room code and click "Join room":
+1. Parses the room code from hex back to a Buffer
+2. Starts a Hyperswarm instance
+3. Joins the DHT as a client, looking for peers under the same topic
+4. Connects to the host
+
+### 3. Gameplay
+Once connected:
+- Host is Player 1 (left paddle, W/S keys)
+- Guest is Player 2 (right paddle, ↑/↓ keys)
+- Ball physics and collision detection run locally on both players
+- Game state is synced via the P2P connection
+- When someone reaches 10 points, the match ends and is saved to the leaderboard
+
+## Code Structure Explanation
+
+```
+p2p-pong/
+├── index.js          # Backend: P2P connections, leaderboard
+├── package.json      # Dependencies and Pear config
+├── ui/
+│   ├── app.js        # Frontend: game logic, UI
+│   ├── index.html    # HTML structure
+│   └── style.css     # Styling
+└── docs/             # Docusaurus documentation
+```
+
+### Key Files
+- `index.js`: Uses Hyperswarm for P2P discovery and Hypercore for persistent leaderboard
+- `ui/app.js`: Handles canvas drawing, input, and game state
+- `pear-pipe`: Communicates between the UI (renderer) and the backend (main process)
+
+## How to Extend the App with Additional Features
+
+Want to add more features? Here are some ideas!
+
+### 1. Spectator Mode
+Add a "spectate" option so others can watch ongoing matches without playing!
+- Add a third role: "spectator"
+- Spectators join the same topic but don't send paddle positions
+- They just receive the game state and draw it
+
+### 2. Chat Feature
+Add an in-game chat!
+- Extend the message types to include `{ type: 'chat', text: '...' }`
+- Add a chat box UI to display messages
+
+### 3. Improved Latency Handling
+Add interpolation or prediction to make the game smoother over high-latency connections!
+- Track the time between messages
+- Interpolate paddle positions between updates
+
+### 4. Blind Peering for Leaderboard
+To make the leaderboard more available, use blind peering!
+- Create a shared Hypercore for the leaderboard
+- Use a well-known topic so peers can find each other and sync the leaderboard
