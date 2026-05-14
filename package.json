@@ -1,0 +1,28 @@
+{
+  "name": "p2p-pong",
+  "main": "index.js",
+  "type": "module",
+  "pear": {
+    "pre": "pear-electron/pre",
+    "name": "p2p-pong",
+    "gui": {
+      "main": "ui/index.html",
+      "width": 900,
+      "height": 600,
+      "minWidth": 500
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "pear run -d ."
+  },
+  "devDependencies": {
+    "pear-interface": "^1.0.0"
+  },
+  "dependencies": {
+    "pear-bridge": "^1.2.0",
+    "pear-electron": "^1.7.10",
+    "hyperswarm": "^4.7.0",
+    "hypercore": "^10.28.0"
+  }
+}
