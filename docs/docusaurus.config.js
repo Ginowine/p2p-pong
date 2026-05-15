@@ -13,6 +13,7 @@ const config = {
   title: 'P2P Pong',
   tagline: 'Direct peer-to-peer Pong game — no servers, no middlemen',
   favicon: 'img/favicon.ico',
+  themes: ['docusaurus-theme-github-codeblock'],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {

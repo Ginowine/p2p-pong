@@ -1,5 +1,8 @@
 ---
 sidebar_position: 0
+tags:
+  - how-to
+  - Javascript
 ---
 
 # UI Shell: HTML & CSS
@@ -10,107 +13,12 @@ First, create the `ui/` directory that holds all frontend files:
 mkdir ui
 ```
 
----
-
 ## `ui/index.html`
 
 The HTML is intentionally minimal. It defines two "screens" (lobby and game) using `display: none` / `display: flex` toggling — no router library needed.
 
-```html
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>P2P Pong</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1><span class="accent">P2P</span>PONG</h1>
-        <p class="sub">direct peer-to-peer · no servers · no middlemen</p>
-      </header>
-
-      <!-- LOBBY SCREEN -->
-      <div id="screen-lobby" class="screen active">
-        <div class="lobby-grid">
-          <div class="card">
-            <div class="card-icon">🏠</div>
-            <h3>Host a match</h3>
-            <p>Create a room and share the code with your opponent.</p>
-            <input id="name-host" placeholder="Your name" class="input" />
-            <button id="btn-host" class="btn btn-primary">Create room</button>
-            <div id="host-code-wrap" class="code-wrap hidden">
-              <span id="host-code"></span>
-              <button id="btn-copy" class="btn btn-secondary">⧉</button>
-            </div>
-          </div>
-
-          <div class="or">OR</div>
-
-          <div class="card">
-            <div class="card-icon">🎮</div>
-            <h3>Join a match</h3>
-            <p>Paste the room code your opponent shared with you.</p>
-            <input id="name-join" placeholder="Your name" class="input" />
-            <input id="join-code" placeholder="64-character room code" class="input" />
-            <button id="btn-join" class="btn btn-secondary">Join room</button>
-            <div id="join-msg" class="msg hidden"></div>
-          </div>
-        </div>
-
-        <div class="leaderboard">
-          <h3 class="lb-title">🏆 Leaderboard</h3>
-          <div id="lb-list" class="lb-list">
-            <span class="lb-empty">No matches yet.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- GAME SCREEN -->
-      <div id="screen-game" class="screen hidden">
-        <div class="hud">
-          <div class="hud-left">
-            <span id="hud-left-name" class="hud-name">Player 1</span>
-            <span id="hud-left-score" class="hud-score">0</span>
-          </div>
-          <div class="hud-center">
-            <span id="hud-status" class="hud-status">Get ready…</span>
-            <div id="hud-ping" class="hud-ping">
-              <span class="hud-ping-dot"></span>
-              <span id="hud-ping-text">P2P</span>
-            </div>
-          </div>
-          <div class="hud-right">
-            <span id="hud-right-score" class="hud-score">0</span>
-            <span id="hud-right-name" class="hud-name">Player 2</span>
-          </div>
-        </div>
-
-        <div class="canvas-wrap">
-          <canvas id="canvas" width="800" height="480"></canvas>
-          <div id="overlay" class="overlay hidden">
-            <div class="overlay-inner">
-              <div id="ov-icon" class="ov-icon">🏆</div>
-              <h2 id="ov-title" class="ov-title">You win!</h2>
-              <p id="ov-msg" class="ov-msg">5 – 0</p>
-              <div class="ov-buttons">
-                <button id="btn-rematch" class="btn btn-primary">Play again</button>
-                <button id="btn-lobby" class="btn btn-secondary">Back to lobby</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <footer class="game-footer">
-          <p><kbd>W</kbd> / <kbd>S</kbd> or <kbd>↑</kbd> / <kbd>↓</kbd> to move your paddle</p>
-        </footer>
-      </div>
-    </div>
-
-    <script type="module" src="app.js"></script>
-  </body>
-</html>
+```html reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/index.html#L1-L123
 ```
 
 **Key structural points:**
@@ -119,156 +27,10 @@ The HTML is intentionally minimal. It defines two "screens" (lobby and game) usi
 - The `canvas` element is fixed at 800x480 so the physics can use absolute pixel coordinates.
 - The overlay (win/disconnect screen) is `position: absolute` over the canvas, blurred with `backdrop-filter`.
 
----
-
 ## `ui/style.css`
 
 The stylesheet uses a dark terminal aesthetic — near-black background, neon green for the left paddle and pink for the right.
 
-```css
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; padding: 0; }
-body {
-  background: #050505;
-  color: #f0f0f0;
-  font-family: 'Courier New', Courier, monospace;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.container { width: 100%; max-width: 950px; display: flex; flex-direction: column; gap: 1.5rem; }
-
-header { text-align: center; }
-header h1 { font-size: 3rem; letter-spacing: 0.3em; margin: 0 0 0.25rem 0; }
-header h1 .accent { color: #39ff14; }
-header .sub { margin: 0; font-size: 0.9rem; opacity: 0.5; letter-spacing: 0.15em; }
-
-.screen { display: none; flex-direction: column; gap: 1.5rem; }
-.screen.active { display: flex; }
-
-.lobby-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem; align-items: start; }
-
-.card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 1.5rem;
-}
-.card-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.card h3 { margin: 0 0 0.5rem 0; font-size: 1.1rem; }
-.card p { margin: 0 0 1rem 0; font-size: 0.9rem; opacity: 0.7; line-height: 1.5; }
-
-.or { font-size: 0.9rem; opacity: 0.3; padding: 1rem 0; }
-
-.input {
-  width: 100%;
-  padding: 0.75rem 0.85rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.03);
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.95rem;
-  margin-bottom: 0.75rem;
-}
-.input:focus { outline: none; border-color: #39ff14; }
-
-.btn {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: bold;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: transform 0.05s, opacity 0.1s;
-}
-.btn:active { transform: translateY(1px); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-primary { background: #39ff14; color: #050505; }
-.btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
-.btn-secondary { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.12); }
-.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
-
-.code-wrap { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-#host-code {
-  flex: 1; padding: 0.6rem 0.7rem; border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4);
-  font-size: 0.85rem; word-break: break-all; opacity: 0.9;
-}
-.code-wrap .btn { width: auto; padding-inline: 1rem; }
-
-.msg { margin-top: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; }
-.msg.ok  { background: rgba(57,255,20,0.1);  border: 1px solid rgba(57,255,20,0.3);  color: #39ff14; }
-.msg.err { background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.3); color: #ff6464; }
-
-.hidden { display: none !important; }
-
-.leaderboard {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-}
-.lb-title { margin: 0 0 0.75rem 0; font-size: 1rem; opacity: 0.9; }
-.lb-list { display: grid; gap: 0.35rem; }
-.lb-empty { opacity: 0.35; font-size: 0.9rem; }
-.lb-row {
-  display: grid;
-  grid-template-columns: 2rem 1fr 4rem 5rem;
-  gap: 0.75rem;
-  align-items: center;
-  font-size: 0.88rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-.lb-row:hover { background: rgba(255,255,255,0.03); }
-.lb-rank { opacity: 0.5; }
-.lb-name { opacity: 0.9; }
-.lb-wins { text-align: center; opacity: 0.8; }
-.lb-pts { text-align: right; opacity: 0.6; }
-
-.hud { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.25rem; }
-.hud-left, .hud-right { display: flex; align-items: baseline; gap: 0.75rem; }
-.hud-right { justify-content: flex-end; }
-.hud-name { font-size: 1rem; opacity: 0.7; }
-.hud-score { font-size: 2rem; font-weight: bold; }
-.hud-left .hud-score  { color: #39ff14; }
-.hud-right .hud-score { color: #ff6bff; }
-.hud-center { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-.hud-status { font-size: 0.9rem; opacity: 0.5; letter-spacing: 0.15em; }
-.hud-ping { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; opacity: 0.35; }
-.hud-ping.live { opacity: 1; }
-.hud-ping-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.3); }
-.hud-ping.live .hud-ping-dot { background: #39ff14; box-shadow: 0 0 8px #39ff14; }
-
-.canvas-wrap { position: relative; display: flex; justify-content: center; }
-canvas {
-  border-radius: 6px;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 25px 50px rgba(0,0,0,0.5);
-}
-
-.overlay {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.72);
-  backdrop-filter: blur(4px);
-}
-.overlay-inner { text-align: center; }
-.ov-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-.ov-title { margin: 0 0 0.5rem 0; font-size: 1.8rem; }
-.ov-msg { margin: 0 0 1.5rem 0; opacity: 0.7; font-size: 1.1rem; }
-.ov-buttons { display: flex; gap: 0.75rem; justify-content: center; }
-.ov-buttons .btn { width: auto; padding-inline: 1.75rem; }
-
-.game-footer { text-align: center; opacity: 0.3; font-size: 0.85rem; }
-kbd {
-  font-family: inherit; padding: 0.15rem 0.45rem;
-  border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-}
+```css reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/style.css#L2-L166
 ```

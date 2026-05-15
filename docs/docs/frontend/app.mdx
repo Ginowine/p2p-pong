@@ -1,5 +1,8 @@
 ---
 sidebar_position: 3
+tags:
+  - how-to
+  - Javascript
 ---
 
 # Frontend: app.js
@@ -14,29 +17,8 @@ The frontend is the UI layer that runs in Chromium! It handles:
 
 First, we use `pear-pipe` to talk to the backend:
 
-```javascript
-import pipe from 'pear-pipe'
-
-const backendPipe = pipe()
-let recvBuf = ''
-
-backendPipe.on('data', (data) => {
-  recvBuf += Buffer.from(data).toString('utf8')
-  const lines = recvBuf.split('\n')
-  recvBuf = lines.pop()
-  for (const line of lines) {
-    if (!line.trim()) continue
-    try { onBackendMessage(JSON.parse(line)) } catch {}
-  }
-})
-
-function toBackend (msg) {
-  backendPipe.write(JSON.stringify(msg) + '\n')
-}
-
-function toPeer (msg) {
-  toBackend({ type: 'send', data: JSON.stringify(msg) })
-}
+```javascript reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/app.js#L1-L24
 ```
 
 This is similar to the backend's message handling!
@@ -45,52 +27,16 @@ This is similar to the backend's message handling!
 
 The lobby handles hosting and joining rooms:
 
-```javascript
-function bindLobby () {
-  $('btn-host').addEventListener('click', () => {
-    myName = $('name-host').value.trim() || 'Player 1'
-    myRole = 'left'
-    $('btn-host').disabled = true
-    $('btn-host').textContent = 'Creating…'
-    toBackend({ type: 'host' })
-  })
-
-  $('btn-join').addEventListener('click', () => {
-    const code = $('join-code').value.trim()
-    myName = $('name-join').value.trim() || 'Player 2'
-    myRole = 'right'
-    if (code.length !== 64) { setMsg('join-msg', 'Need a 64-character room code.', 'err'); return }
-    setMsg('join-msg', 'Connecting…', 'ok')
-    $('btn-join').disabled = true
-    toBackend({ type: 'join', code })
-  })
-}
+```javascript reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/app.js#L60-L87
 ```
 
 ## Game Loop
 
 The game loop runs at ~60 FPS using `requestAnimationFrame`:
 
-```javascript
-function startRenderLoop () {
-  cancelAnimationFrame(loopId); loopId = null
-  const tick = () => {
-    loopId = requestAnimationFrame(tick)
-    if (!state) { R.drawWaiting(); return }
-
-    if (myRole === 'left' && state._hostRunning) {
-      maybeResume(state)
-      const events = step(state)
-      if (events.includes('point-left') || events.includes('point-right')) updateScoreHud()
-      toPeer({ type: 'state', s: serialize(state) })
-      if (state.phase === 'gameover') { state._hostRunning = false; onGameOver() }
-    }
-
-    R.draw(state)
-    if (latency !== null) $('hud-ping-text').textContent = `${latency}ms`
-  }
-  tick()
-}
+```javascript reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/app.js#L165-L183
 ```
 
 Note that only the host runs the physics simulation! The guest just renders snapshots from the host!
@@ -99,42 +45,9 @@ Note that only the host runs the physics simulation! The guest just renders snap
 
 We handle keyboard input for controlling the paddles:
 
-```javascript
-const KEYS = { ArrowUp: -1, KeyW: -1, ArrowDown: 1, KeyS: 1 }
-const held = { up: false, down: false }
-let lastDy = null
-
-function bindKeys () {
-  document.addEventListener('keydown', e => {
-    if (KEYS[e.code] === undefined) return
-    e.preventDefault()
-    if (KEYS[e.code] === -1) held.up   = true
-    if (KEYS[e.code] ===  1) held.down = true
-    flushInput()
-  })
-  document.addEventListener('keyup', e => {
-    if (KEYS[e.code] === undefined) return
-    if (KEYS[e.code] === -1) held.up   = false
-    if (KEYS[e.code] ===  1) held.down = false
-    flushInput()
-  })
-}
-
-function flushInput () {
-  if (!state || state.phase === 'gameover') return
-  const dy = (held.up && !held.down) ? -1 : (held.down && !held.up) ? 1 : 0
-  if (dy === lastDy) return
-  lastDy = dy
-  if (myRole === 'left') {
-    setPaddleDir(state, 'left', dy)
-  } else {
-    setPaddleDir(state, 'right', dy)
-    toPeer({ type: 'paddle', dy })
-  }
-}
+```javascript reference
+https://github.com/Ginowine/p2p-pong/blob/master/ui/app.js#L185-L216
 ```
-
----
 
 ## Install dependencies and run
 

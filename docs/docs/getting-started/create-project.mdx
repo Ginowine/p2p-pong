@@ -1,8 +1,13 @@
+---
+title: Building a P2P Pong Game with Pear
+tags:
+  - how-to
+  - Javascript
+---
+
 # Building a P2P Pong Game with Pear
 
-This guide walks you through building a fully peer-to-peer Pong game from scratch using the [Pear runtime](https://docs.pears.com). Two players connect directly — no servers, no middlemen. The finished app includes real-time gameplay, a ping indicator, and a local leaderboard that syncs between players.
-
----
+This guide walks you through building a fully peer-to-peer Pong game from scratch using the [Pear runtime](https://docs.pears.com). Two players connect directly, no servers, no middlemen. The finished app includes real-time gameplay, a ping indicator, and a local leaderboard that syncs between players.
 
 ## What You'll Be Building
 
@@ -32,8 +37,6 @@ This guide walks you through building a fully peer-to-peer Pong game from scratc
 
 The **backend** (`index.js`) handles all networking (Hyperswarm for matchmaking, Hypercore for the leaderboard). The **UI** runs in a browser-like context and talks to the backend through a bidirectional pipe, sending and receiving newline-delimited JSON messages.
 
----
-
 ## Prerequisites
 
 Install the Pear runtime before starting:
@@ -42,8 +45,6 @@ Install the Pear runtime before starting:
 npm install -g pear
 ```
 
----
-
 ## Step 1 — Create the project directory
 
 ```bash
@@ -51,39 +52,10 @@ mkdir p2p-pong
 cd p2p-pong
 ```
 
----
-
 ## Step 2 — Create `package.json`
 
-```json
-{
-  "name": "p2p-pong",
-  "main": "index.js",
-  "type": "module",
-  "pear": {
-    "pre": "pear-electron/pre",
-    "name": "p2p-pong",
-    "gui": {
-      "main": "ui/index.html",
-      "width": 900,
-      "height": 600,
-      "minWidth": 500
-    }
-  },
-  "license": "MIT",
-  "scripts": {
-    "dev": "pear run -d ."
-  },
-  "devDependencies": {
-    "pear-interface": "^1.0.0"
-  },
-  "dependencies": {
-    "pear-bridge": "^1.2.0",
-    "pear-electron": "^1.7.10",
-    "hyperswarm": "^4.7.0",
-    "hypercore": "^10.28.0"
-  }
-}
+```json reference
+https://github.com/Ginowine/p2p-pong/blob/master/package.json
 ```
 
 **Key fields explained:**
@@ -94,8 +66,6 @@ cd p2p-pong
 - `hypercore` — an append-only log that can replicate between peers, used here for the leaderboard.
 - `pear-bridge` — provides the message pipe between the backend Node process and the UI.
 
----
-
 ## What's Next?
 
-Now that the project is set up, let's build the backend — the Node.js process that handles all peer-to-peer networking!
+Now that the project is set up, let's build the backend, the Node.js process that handles all peer-to-peer networking!
