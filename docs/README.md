@@ -1,41 +1,33 @@
 # Website
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+# p2p-pong
 
-## Installation
+A peer-to-peer ping pong game built with the Pear platform.
+
+## Documentation
+
+The project documentation is built with [Docusaurus](https://docusaurus.io) and lives in the `docs/` folder.
+
+### Running the docs locally
+
+From the root of the project, navigate into the docs folder and start the development server:
 
 ```bash
-yarn
+cd docs
+npm install
+npm start
 ```
-
-## Local Development
-
-```bash
-yarn start
-```
-
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
-## Build
+The docs site will be available at `http://localhost:3000`.
+
+### Building the docs
+
+To generate a production build of the documentation:
 
 ```bash
-yarn build
+cd docs
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The static output will be in `docs/build/`.
