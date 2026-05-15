@@ -1,10 +1,14 @@
 import { W, H, PADDLE_W, PADDLE_H, BALL_R, LEFT_X, RIGHT_X } from './physics.js'
 
 const C = {
-  bg: '#080808', net: 'rgba(255,255,255,0.07)',
-  left: '#39ff14', leftDim: 'rgba(57,255,20,0.12)',
-  right: '#ff6bff', rightDim: 'rgba(255,107,255,0.12)',
-  ball: '#ffffff', ballGlow: 'rgba(255,255,255,0.2)',
+  bg:       '#080808',
+  net:      'rgba(255,255,255,0.07)',
+  left:     '#39ff14',
+  leftDim:  'rgba(57,255,20,0.12)',
+  right:    '#ff6bff',
+  rightDim: 'rgba(255,107,255,0.12)',
+  ball:     '#ffffff',
+  ballGlow: 'rgba(255,255,255,0.2)',
 }
 
 export class Renderer {
@@ -25,7 +29,10 @@ export class Renderer {
     ctx.strokeStyle = C.net
     ctx.lineWidth   = 2
     ctx.setLineDash([12, 10])
-    ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(W / 2, 0)
+    ctx.lineTo(W / 2, H)
+    ctx.stroke()
     ctx.setLineDash([])
     ctx.restore()
 
@@ -39,12 +46,17 @@ export class Renderer {
 
     const glowR = BALL_R * 3.5
     const grd   = ctx.createRadialGradient(state.ball.x, state.ball.y, 0, state.ball.x, state.ball.y, glowR)
-    grd.addColorStop(0, C.ballGlow); grd.addColorStop(1, 'transparent')
+    grd.addColorStop(0, C.ballGlow)
+    grd.addColorStop(1, 'transparent')
     ctx.fillStyle = grd
-    ctx.beginPath(); ctx.arc(state.ball.x, state.ball.y, glowR, 0, Math.PI * 2); ctx.fill()
+    ctx.beginPath()
+    ctx.arc(state.ball.x, state.ball.y, glowR, 0, Math.PI * 2)
+    ctx.fill()
 
     ctx.fillStyle = C.ball
-    ctx.beginPath(); ctx.arc(state.ball.x, state.ball.y, BALL_R, 0, Math.PI * 2); ctx.fill()
+    ctx.beginPath()
+    ctx.arc(state.ball.x, state.ball.y, BALL_R, 0, Math.PI * 2)
+    ctx.fill()
 
     this._paddle(ctx, LEFT_X,  state.left.y,  C.left,  C.leftDim)
     this._paddle(ctx, RIGHT_X, state.right.y, C.right, C.rightDim)
@@ -54,7 +66,8 @@ export class Renderer {
       if (n !== '') {
         ctx.save()
         ctx.font = 'bold 100px "Courier New", monospace'
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.fillStyle = 'rgba(255,255,255,0.10)'
         ctx.fillText(String(n), W / 2, H / 2)
         ctx.restore()
@@ -64,18 +77,27 @@ export class Renderer {
 
   _paddle (ctx, x, y, color, dimColor) {
     const grd = ctx.createLinearGradient(x - 8, y, x + PADDLE_W + 8, y)
-    grd.addColorStop(0, dimColor); grd.addColorStop(0.5, dimColor); grd.addColorStop(1, 'transparent')
+    grd.addColorStop(0, dimColor)
+    grd.addColorStop(0.5, dimColor)
+    grd.addColorStop(1, 'transparent')
     ctx.fillStyle = grd
-    ctx.beginPath(); ctx.roundRect(x - 8, y, PADDLE_W + 16, PADDLE_H, 4); ctx.fill()
+    ctx.beginPath()
+    ctx.roundRect(x - 8, y, PADDLE_W + 16, PADDLE_H, 4)
+    ctx.fill()
+
     ctx.fillStyle = color
-    ctx.beginPath(); ctx.roundRect(x, y, PADDLE_W, PADDLE_H, 4); ctx.fill()
+    ctx.beginPath()
+    ctx.roundRect(x, y, PADDLE_W, PADDLE_H, 4)
+    ctx.fill()
   }
 
   drawWaiting () {
     const { ctx } = this
-    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = C.bg
+    ctx.fillRect(0, 0, W, H)
     ctx.font = '14px "Courier New", monospace'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
     ctx.fillStyle = 'rgba(255,255,255,0.18)'
     ctx.fillText('awaiting connection…', W / 2, H / 2)
     ctx.textAlign = 'left'

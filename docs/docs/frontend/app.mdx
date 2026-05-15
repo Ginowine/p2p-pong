@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 # Frontend: app.js
@@ -133,3 +133,16 @@ function flushInput () {
   }
 }
 ```
+
+---
+
+## Install dependencies and run
+
+Now that all files are in place, install the dependencies and launch the app:
+
+```bash
+npm install
+pear run -d .
+```
+
+The `-d` flag runs in development mode with live reload. To test multiplayer on a single machine, open a second terminal and run the same command — both instances can connect to each other.

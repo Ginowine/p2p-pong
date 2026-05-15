@@ -20,9 +20,10 @@
     "pear-interface": "^1.0.0"
   },
   "dependencies": {
-    "pear-bridge": "^1.2.0",
-    "pear-electron": "^1.7.10",
+    "hypercore": "^10.28.0",
     "hyperswarm": "^4.7.0",
-    "hypercore": "^10.28.0"
+    "pear": "^2.0.1",
+    "pear-bridge": "^1.2.0",
+    "pear-electron": "^1.7.10"
   }
 }

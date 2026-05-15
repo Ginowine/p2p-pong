@@ -97,7 +97,9 @@ export function step (state) {
 }
 
 export function maybeResume (state) {
-  if (state.phase === 'point' && state.tick >= state._resumeAtTick) state.phase = 'playing'
+  if (state.phase === 'point' && state.tick >= state._resumeAtTick) {
+    state.phase = 'playing'
+  }
 }
 
 function reflect (ball, paddle, outDir) {
@@ -119,20 +121,29 @@ function addEffect (state, x, y) {
 
 export function serialize (state) {
   return {
-    lp: Math.round(state.left.y),  rp: Math.round(state.right.y),
-    ls: state.left.score,          rs: state.right.score,
+    lp: Math.round(state.left.y),
+    rp: Math.round(state.right.y),
+    ls: state.left.score,
+    rs: state.right.score,
     bx: Math.round(state.ball.x * 10) / 10,
     by: Math.round(state.ball.y * 10) / 10,
-    ph: state.phase, wi: state.winner, tk: state.tick,
+    ph: state.phase,
+    wi: state.winner,
+    tk: state.tick,
     rt: state._resumeAtTick || 0,
   }
 }
 
 export function applySnapshot (state, snap) {
-  state.left.y       = snap.lp;  state.right.y      = snap.rp
-  state.left.score   = snap.ls;  state.right.score  = snap.rs
-  state.ball.x       = snap.bx;  state.ball.y       = snap.by
-  state.phase        = snap.ph;  state.winner       = snap.wi
-  state.tick         = snap.tk;  state._resumeAtTick = snap.rt || 0
+  state.left.y       = snap.lp
+  state.right.y      = snap.rp
+  state.left.score   = snap.ls
+  state.right.score  = snap.rs
+  state.ball.x       = snap.bx
+  state.ball.y       = snap.by
+  state.phase        = snap.ph
+  state.winner       = snap.wi
+  state.tick         = snap.tk
+  state._resumeAtTick = snap.rt || 0
   state.effects      = state.effects || []
 }

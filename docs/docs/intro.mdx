@@ -67,7 +67,7 @@ Once connected:
 - Guest is Player 2 (right paddle, ↑/↓ keys)
 - Ball physics and collision detection run locally on both players
 - Game state is synced via the P2P connection
-- When someone reaches 10 points, the match ends and is saved to the leaderboard
+- When someone reaches 7 points, the match ends and is saved to the leaderboard
 
 ## Code Structure Explanation
 
@@ -75,17 +75,19 @@ Once connected:
 p2p-pong/
 ├── index.js          # Backend: P2P connections, leaderboard
 ├── package.json      # Dependencies and Pear config
-├── ui/
-│   ├── app.js        # Frontend: game logic, UI
-│   ├── index.html    # HTML structure
-│   └── style.css     # Styling
-└── docs/             # Docusaurus documentation
+└── ui/
+    ├── index.html    # HTML structure
+    ├── style.css     # Styling
+    ├── app.js        # UI controller: pipe, input, game lifecycle
+    ├── physics.js    # Game engine: state, step, serialize
+    ├── renderer.js   # Canvas drawing
 ```
 
 ### Key Files
 - `index.js`: Uses Hyperswarm for P2P discovery and Hypercore for persistent leaderboard
-- `ui/app.js`: Handles canvas drawing, input, and game state
-- `pear-pipe`: Communicates between the UI (renderer) and the backend (main process)
+- `ui/app.js`: UI controller — wires the backend pipe, keyboard input, game lifecycle, and leaderboard
+- `ui/physics.js`: Pure game logic — state creation, simulation step, serialization
+- `ui/renderer.js`: Canvas drawing — takes game state and renders a frame
 
 ## How to Extend the App with Additional Features
 

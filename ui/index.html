@@ -1,94 +1,123 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>P2P Pong</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1><span class="accent">P2P</span>PONG</h1>
-        <p class="sub">direct peer-to-peer · no servers · no middlemen</p>
-      </header>
+<!DOCTYPE html>
+<html lang="en" style="background:#080808;color:#f0f0f0">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    /* Pear title bar — required by pear-electron */
+    body {
+      --title-bar-height: 36px;
+      padding-top: var(--title-bar-height);
+      margin: 0;
+      background: #080808;
+    }
+    #bar {
+      background: rgba(20, 20, 20, 0.85);
+      backdrop-filter: blur(64px);
+      -webkit-app-region: drag;
+      height: var(--title-bar-height);
+      position: fixed;
+      z-index: 100;
+      width: 100%;
+      left: 0;
+      top: 0;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    pear-ctrl[data-platform=darwin] {
+      margin-top: 10px;
+      margin-left: 12px;
+    }
+  </style>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <!-- Pear window chrome (traffic lights on macOS) -->
+  <div id="bar"><pear-ctrl></pear-ctrl></div>
 
-      <!-- LOBBY SCREEN -->
-      <div id="screen-lobby" class="screen active">
-        <div class="lobby-grid">
-          <div class="card">
-            <div class="card-icon">🏠</div>
-            <h3>Host a match</h3>
-            <p>Create a room and share the code with your opponent.</p>
-            <input id="name-host" placeholder="Your name" class="input" />
-            <button id="btn-host" class="btn btn-primary">Create room</button>
-            <div id="host-code-wrap" class="code-wrap hidden">
-              <span id="host-code"></span>
-              <button id="btn-copy" class="btn btn-secondary">⧉</button>
-            </div>
+  <!-- ═══════════════════════════════════════════
+       LOBBY SCREEN
+  ════════════════════════════════════════════ -->
+  <div id="screen-lobby" class="screen active">
+    <header class="lobby-header">
+      <div class="logo-text">P2P<span>PONG</span></div>
+      <p class="tagline">direct peer-to-peer · no servers · no middlemen</p>
+    </header>
+
+    <div class="lobby-grid">
+      <div class="card">
+        <div class="card-icon">🏠</div>
+        <h2>Host a match</h2>
+        <p>Create a room and share the code with your opponent.</p>
+        <input id="name-host" type="text" placeholder="Your name" maxlength="14" autocomplete="off" />
+        <button id="btn-host" class="btn-green">Create room</button>
+        <div id="host-code-wrap" class="code-wrap hidden">
+          <span class="code-label">Share this room code</span>
+          <div class="code-row">
+            <code id="host-code"></code>
+            <button id="btn-copy" class="btn-copy" title="Copy">⧉</button>
           </div>
-
-          <div class="or">OR</div>
-
-          <div class="card">
-            <div class="card-icon">🎮</div>
-            <h3>Join a match</h3>
-            <p>Paste the room code your opponent shared with you.</p>
-            <input id="name-join" placeholder="Your name" class="input" />
-            <input id="join-code" placeholder="64-character room code" class="input" />
-            <button id="btn-join" class="btn btn-secondary">Join room</button>
-            <div id="join-msg" class="msg hidden"></div>
-          </div>
-        </div>
-
-        <div class="leaderboard">
-          <h3 class="lb-title">🏆 Leaderboard</h3>
-          <div id="lb-list" class="lb-list">
-            <span class="lb-empty">No matches yet.</span>
-          </div>
+          <span class="waiting-pulse">waiting for opponent…</span>
         </div>
       </div>
 
-      <!-- GAME SCREEN -->
-      <div id="screen-game" class="screen hidden">
-        <div class="hud">
-          <div class="hud-left">
-            <span id="hud-left-name" class="hud-name">Player 1</span>
-            <span id="hud-left-score" class="hud-score">0</span>
-          </div>
-          <div class="hud-center">
-            <span id="hud-status" class="hud-status">Get ready…</span>
-            <div id="hud-ping" class="hud-ping">
-              <span class="hud-ping-dot"></span>
-              <span id="hud-ping-text">P2P</span>
-            </div>
-          </div>
-          <div class="hud-right">
-            <span id="hud-right-score" class="hud-score">0</span>
-            <span id="hud-right-name" class="hud-name">Player 2</span>
-          </div>
-        </div>
+      <div class="or-divider">OR</div>
 
-        <div class="canvas-wrap">
-          <canvas id="canvas" width="800" height="480"></canvas>
-          <div id="overlay" class="overlay hidden">
-            <div class="overlay-inner">
-              <div id="ov-icon" class="ov-icon">🏆</div>
-              <h2 id="ov-title" class="ov-title">You win!</h2>
-              <p id="ov-msg" class="ov-msg">5 – 0</p>
-              <div class="ov-buttons">
-                <button id="btn-rematch" class="btn btn-primary">Play again</button>
-                <button id="btn-lobby" class="btn btn-secondary">Back to lobby</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <footer class="game-footer">
-          <p><kbd>W</kbd> / <kbd>S</kbd> or <kbd>↑</kbd> / <kbd>↓</kbd> to move your paddle</p>
-        </footer>
+      <div class="card">
+        <div class="card-icon">🎮</div>
+        <h2>Join a match</h2>
+        <p>Paste the room code your opponent shared with you.</p>
+        <input id="name-join" type="text" placeholder="Your name" maxlength="14" autocomplete="off" />
+        <input id="join-code" type="text" placeholder="64-character room code" maxlength="64" autocomplete="off" spellcheck="false" />
+        <button id="btn-join" class="btn-white">Join room</button>
+        <p id="join-msg" class="msg hidden"></p>
       </div>
     </div>
 
-    <script type="module" src="app.js"></script>
-  </body>
+    <div class="lb-panel">
+      <h3>🏆 Leaderboard</h3>
+      <div id="lb-list"><span class="lb-empty">No matches yet.</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       GAME SCREEN
+  ════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="hud">
+      <div class="hud-player left">
+        <span class="hud-name" id="hud-left-name">Left</span>
+        <span class="hud-score" id="hud-left-score">0</span>
+      </div>
+      <div class="hud-center">
+        <span id="hud-status">—</span>
+        <div id="hud-ping" class="ping-badge">
+          <span class="ping-dot"></span>
+          <span id="hud-ping-text">P2P</span>
+        </div>
+      </div>
+      <div class="hud-player right">
+        <span class="hud-score" id="hud-right-score">0</span>
+        <span class="hud-name" id="hud-right-name">Right</span>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="800" height="480"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-box">
+          <div id="ov-icon" class="ov-icon"></div>
+          <h2 id="ov-title"></h2>
+          <p  id="ov-msg"></p>
+          <div class="ov-actions">
+            <button id="btn-rematch" class="btn-green hidden">Rematch</button>
+            <button id="btn-lobby"   class="btn-white">Lobby</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-bar">W / S &nbsp;or&nbsp; ↑ / ↓ to move your paddle</div>
+  </div>
+</body>
 </html>

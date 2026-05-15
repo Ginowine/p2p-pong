@@ -2,3 +2,4 @@ node_modules/
 .pear/
 *.log
 EOF
+.DS_Store

@@ -16,7 +16,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Frontend',
-      items: ['frontend/app', 'frontend/physics', 'frontend/renderer'],
+      items: ['frontend/html-css', 'frontend/physics', 'frontend/renderer', 'frontend/app'],
     },
   ],
 };

@@ -163,6 +163,7 @@ async function onLbInit () {
   }
 }
 
+//Leaderboard: append a match result
 async function onLbRecord (entry) {
   if (!lbCore) return
   try { await lbCore.append(entry) } catch (e) { console.error('[BE] lb record:', e) }

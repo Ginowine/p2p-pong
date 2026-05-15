@@ -15,8 +15,13 @@ backendPipe.on('data', (data) => {
   }
 })
 
-function toBackend (msg) { backendPipe.write(JSON.stringify(msg) + '\n') }
-function toPeer    (msg) { toBackend({ type: 'send', data: JSON.stringify(msg) }) }
+function toBackend (msg) {
+  backendPipe.write(JSON.stringify(msg) + '\n')
+}
+
+function toPeer (msg) {
+  toBackend({ type: 'send', data: JSON.stringify(msg) })
+}
 
 const canvas = document.getElementById('canvas')
 const R      = new Renderer(canvas)
@@ -43,12 +48,12 @@ bindKeys()
 
 function onBackendMessage (msg) {
   switch (msg.type) {
-    case 'hosted':          onHosted(msg.code); break
-    case 'peer-connect':    onPeerConnect(); break
-    case 'peer-disconnect': onDisconnect(); break
-    case 'peer-message':    onPeerMessage(JSON.parse(msg.data)); break
-    case 'lb-ready':        onLbReady(msg.entries); break
-    case 'lb-updated':      onLbUpdated(msg.entries); break
+    case 'hosted':         onHosted(msg.code); break
+    case 'peer-connect':   onPeerConnect(); break
+    case 'peer-disconnect':onDisconnect(); break
+    case 'peer-message':   onPeerMessage(JSON.parse(msg.data)); break
+    case 'lb-ready':       onLbReady(msg.entries); break
+    case 'lb-updated':     onLbUpdated(msg.entries); break
   }
 }
 
@@ -107,22 +112,29 @@ function onPeerMessage (msg) {
         launchGame()
       } else {
         setMsg('join-msg', `Connected to ${oppName}!`, 'ok')
-        switchScreen('game'); setupHud(); startRenderLoop()
+        switchScreen('game')
+        setupHud()
+        startRenderLoop()
       }
       break
+
     case 'countdown': setHudStatus(msg.n > 0 ? `${msg.n}…` : 'GO!'); break
     case 'start':     setHudStatus('GO!'); break
+
     case 'state':
       if (!state) state = createState()
       applySnapshot(state, msg.s)
       updateScoreHud()
       if (state.phase === 'gameover' && !state._guestEndHandled) {
-        state._guestEndHandled = true; onGameOver()
+        state._guestEndHandled = true
+        onGameOver()
       }
       break
+
     case 'paddle':
       if (myRole === 'left' && state) setPaddleDir(state, 'right', msg.dy)
       break
+
     case 'rematch':
       if (myRole === 'right') startRematch()
       break
@@ -130,7 +142,11 @@ function onPeerMessage (msg) {
 }
 
 function launchGame () {
-  state = createState(); switchScreen('game'); setupHud(); startRenderLoop(); runCountdown(3)
+  state = createState()
+  switchScreen('game')
+  setupHud()
+  startRenderLoop()
+  runCountdown(3)
 }
 
 function runCountdown (n) {
@@ -139,7 +155,9 @@ function runCountdown (n) {
   if (n > 0) {
     cdTimer = setTimeout(() => runCountdown(n - 1), 1000)
   } else if (myRole === 'left') {
-    state.phase = 'playing'; state.countdown = 0; state._hostRunning = true
+    state.phase        = 'playing'
+    state.countdown    = 0
+    state._hostRunning = true
     toPeer({ type: 'start' })
   }
 }
@@ -149,6 +167,7 @@ function startRenderLoop () {
   const tick = () => {
     loopId = requestAnimationFrame(tick)
     if (!state) { R.drawWaiting(); return }
+
     if (myRole === 'left' && state._hostRunning) {
       maybeResume(state)
       const events = step(state)
@@ -156,6 +175,7 @@ function startRenderLoop () {
       toPeer({ type: 'state', s: serialize(state) })
       if (state.phase === 'gameover') { state._hostRunning = false; onGameOver() }
     }
+
     R.draw(state)
     if (latency !== null) $('hud-ping-text').textContent = `${latency}ms`
   }
@@ -198,16 +218,21 @@ function flushInput () {
 function onGameOver () {
   cancelAnimationFrame(loopId); loopId = null
   if (state) R.draw(state)
+
   const myPaddle  = myRole
   const oppPaddle = myRole === 'left' ? 'right' : 'left'
   const won       = state.winner === myPaddle
+
   const entry = {
     playerName: myName, opponent: oppName, won,
-    myScore: state[myPaddle].score, opponentScore: state[oppPaddle].score, ts: Date.now(),
+    myScore: state[myPaddle].score,
+    opponentScore: state[oppPaddle].score,
+    ts: Date.now(),
   }
   lbEntries.push(entry)
   refreshLb()
   toBackend({ type: 'lb-record', entry })
+
   const title = won ? 'You win!' : `${oppName} wins`
   showOverlay(won ? '🏆' : '😬', title, `${state.left.score} – ${state.right.score}`, myRole === 'left')
   setHudStatus(title)
@@ -227,7 +252,8 @@ function startRematch () {
 }
 
 function onDisconnect () {
-  cancelAnimationFrame(loopId); clearTimeout(cdTimer); clearInterval(pingId); loopId = null
+  cancelAnimationFrame(loopId); clearTimeout(cdTimer); clearInterval(pingId)
+  loopId = null
   showOverlay('🔌', 'Disconnected', 'Your opponent left.', false)
   $('hud-ping').classList.remove('live')
 }
@@ -247,7 +273,8 @@ function startPinging () {
   clearInterval(pingId)
   $('hud-ping').classList.add('live')
   pingId = setInterval(() => {
-    const seq = ++pingSeq; pings.set(seq, Date.now())
+    const seq = ++pingSeq
+    pings.set(seq, Date.now())
     toPeer({ _type: 'ping', seq })
   }, 1000)
 }
@@ -276,8 +303,8 @@ function showOverlay (icon, title, msg, showRematch) {
 }
 function hideOverlay () { hide('overlay') }
 
-function onLbReady   (entries) { lbEntries = entries || []; refreshLb() }
-function onLbUpdated (entries) { lbEntries = entries || []; refreshLb() }
+function onLbReady  (entries) { lbEntries = entries || []; refreshLb() }
+function onLbUpdated(entries) { lbEntries = entries || []; refreshLb() }
 
 function refreshLb () {
   const top = [...lbEntries]
@@ -305,7 +332,4 @@ function setMsg (id, text, cls) {
   const el = $(id); if (!el) return
   el.textContent = text; el.className = `msg ${cls}`; el.classList.remove('hidden')
 }
-
-function esc (s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-}
+function esc (s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
